@@ -13,6 +13,7 @@ public class Product
 
     public string Description { get; set; } = string.Empty;
 
+    [Range(1900, 2155, ErrorMessage = "Year must be between 1900 and 2155.")]
     public int Year { get; set; }
 
     public string[] Genres { get; set; } = { };

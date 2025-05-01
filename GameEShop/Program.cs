@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Pomelo.EntityFrameworkCore.MySql;
 using EShop.Domain.Repositories;
 using EShop.Application.Service;
 using EShop.Domain.Seeders;
@@ -11,7 +12,14 @@ namespace EShop
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            builder.Services.AddDbContext<DataContext>(x => x.UseInMemoryDatabase("TestDb"), ServiceLifetime.Transient);
+            builder.Services.AddDbContext<DataContext>(options =>
+                options.UseMySql(
+                    builder.Configuration.GetConnectionString("DefaultConnection"),
+                    new MySqlServerVersion(new Version(8, 0, 32)) 
+                ));
+
+
+
             builder.Services.AddScoped<IRepository, Repository>();
             builder.Services.AddScoped<IEShopSeeder, EShopSeeder>();
             builder.Services.AddScoped<IProductService, ProductService>();
