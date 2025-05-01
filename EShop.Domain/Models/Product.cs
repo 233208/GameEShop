@@ -1,0 +1,37 @@
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
+
+namespace EShop.Domain.Models;
+
+public class Product
+{
+    [Key]
+    public int Id { get; set; } = 0;
+
+    [Required]
+    public string Name { get; set; } = string.Empty;
+
+    public string Description { get; set; } = string.Empty;
+
+    public int Year { get; set; }
+
+    public string[] Genres { get; set; } = { };
+
+    [Column(TypeName = "decimal(18,2)")]
+    public decimal Price { get; set; }
+
+    public int Stock { get; set; }
+
+    public string Producer { get; set; } = string.Empty;
+
+    public string Publisher { get; set; } = string.Empty;
+
+    public string Platform { get; set; } = string.Empty;
+
+    public SystemRequirements SystemRequirements { get; set; } = default!;
+    [Range(0, 5)]
+    public decimal Rating { get; set; }
+
+    public Boolean Deleted { get; set; } = false;
+
+}
