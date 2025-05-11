@@ -39,5 +39,19 @@ namespace UserService.Controllers
         {
             return Ok();
         }
+        [HttpGet("set-session")]
+        public IActionResult SetSession()
+        {
+            HttpContext.Session.SetString("UserName", "JohnDoe");
+            return Ok("Session set");
+        }
+
+        [HttpGet("get-session")]
+        public IActionResult GetSession()
+        {
+            var userName = HttpContext.Session.GetString("UserName");
+            return Ok(userName ?? "No session value");
+        }
     }
+
 }

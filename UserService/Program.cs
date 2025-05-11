@@ -77,6 +77,21 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = "redis:6379"; 
+    options.InstanceName = "Session_";
+});
+
+
+
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30); // Czas trwania sesji
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -91,6 +106,8 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
+
+app.UseSession();
 
 app.MapControllers();
 
