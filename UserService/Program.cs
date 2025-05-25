@@ -1,12 +1,20 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System.Text;
+using System.Security.Cryptography;
 using User.Application.Services;
 using User.Application.Settings;
-using User.Domain.Models;
+using User.Domain.Repositories;
+
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddDbContext<UserDbContext>(options =>
+             options.UseMySql(
+                 builder.Configuration.GetConnectionString("DefaultConnection"),
+                 new MySqlServerVersion(new Version(8, 0, 32))
+             ));
 
 // JWT config
 var jwtSettings = builder.Configuration.GetSection("Jwt");
@@ -19,6 +27,10 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
+    var rsa = RSA.Create();
+    rsa.ImportFromPem(File.ReadAllText("./data/public.key"));
+    var publicKey = new RsaSecurityKey(rsa);
+
     var jwtConfig = jwtSettings.Get<JwtSettings>();
     options.TokenValidationParameters = new TokenValidationParameters
     {
@@ -28,7 +40,7 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         ValidIssuer = jwtConfig.Issuer,
         ValidAudience = jwtConfig.Audience,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfig.Key))
+        IssuerSigningKey = publicKey
     };
 });
 
@@ -79,7 +91,7 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddStackExchangeRedisCache(options =>
 {
-    options.Configuration = "redis:6379"; 
+    options.Configuration = "redis:6379";
     options.InstanceName = "Session_";
 });
 
@@ -92,6 +104,18 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend",
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:64452") // your frontend origin
+                  .AllowAnyHeader()
+                  .AllowAnyMethod()
+                  .AllowCredentials();
+        });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -100,7 +124,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+app.UseCors("AllowFrontend");
 app.UseHttpsRedirection();
 
 app.UseAuthentication();

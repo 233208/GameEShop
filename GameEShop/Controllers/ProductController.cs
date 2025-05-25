@@ -1,5 +1,6 @@
 ﻿using EShop.Application.Service;
 using EShop.Domain.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -38,6 +39,7 @@ namespace EShopService.Controllers
         }
 
         // POST api/<ProductController>
+        [Authorize(Policy = "EmployeeOnly")]
         [HttpPost]
         public async Task<ActionResult> Post([FromBody] Product product)
         {
@@ -47,6 +49,7 @@ namespace EShopService.Controllers
         }
 
         // PUT api/<ProductController>/5
+        [Authorize(Policy = "EmployeeOnly")]
         [HttpPut("{id}")]
         public async Task<ActionResult> Put(int id, [FromBody] Product product)
         {
@@ -56,6 +59,7 @@ namespace EShopService.Controllers
         }
 
         // DELETE api/<ProductController>/5
+        [Authorize(Policy = "EmployeeOnly")]
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
@@ -67,10 +71,11 @@ namespace EShopService.Controllers
         }
 
         // PATCH api/<ProductController>/6
+        [Authorize(Policy = "EmployeeOnly")]
         [HttpPatch]
         public ActionResult Add([FromBody] Product product)
         {
-            var result =  _productService.Add(product);
+            var result = _productService.Add(product);
 
             return Ok(result);
         }

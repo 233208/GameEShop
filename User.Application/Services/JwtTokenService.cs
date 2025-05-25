@@ -2,7 +2,7 @@
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Text;
+using System.Security.Cryptography;
 using User.Application.Services;
 using User.Application.Settings;
 
@@ -17,16 +17,16 @@ public class JwtTokenService : IJwtTokenService
 
     public string GenerateToken(int userId, List<string> roles)
     {
-
         var claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.NameIdentifier, userId.ToString())
-        };
+    {
+        new Claim(ClaimTypes.NameIdentifier, userId.ToString())
+    };
 
         claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.Key));
-        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+        var rsa = RSA.Create();
+        rsa.ImportFromPem(File.ReadAllText("./data/private.key"));
+        var creds = new SigningCredentials(new RsaSecurityKey(rsa), SecurityAlgorithms.RsaSha256);
 
         var token = new JwtSecurityToken(
             issuer: _settings.Issuer,
@@ -37,4 +37,5 @@ public class JwtTokenService : IJwtTokenService
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
+
 }

@@ -34,7 +34,7 @@ public class ValidateCardNumber
 
         return (sum % 10 == 0);
     }
-    
+
     public string GetCardType(string cardNumber)
     {
         cardNumber = cardNumber.Replace(" ", "").Replace("-", "");

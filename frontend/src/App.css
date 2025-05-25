@@ -1,0 +1,291 @@
+/* Globalne Style */
+:root {
+    --primary-color: #646cff; /* G³ówny kolor akcentu (z logo) */
+    --primary-color-darker: #535bf2;
+    --secondary-color: #28a745; /* Kolor dla przycisków akcji (np. dodaj do koszyka) */
+    --secondary-color-darker: #218838;
+    --background-color: #f0f2f5; /* Jaœniejsze t³o */
+    --card-background-color: #ffffff;
+    --text-color: #333;
+    --muted-text-color: #777;
+    --border-color: #e0e0e0;
+    --error-color: #d32f2f;
+    --font-family: 'Roboto', sans-serif; /* Nowoczesna czcionka - upewnij siê, ¿e jest zaimportowana */
+    --border-radius: 8px;
+    --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --transition-speed: 0.3s;
+}
+
+/* Import czcionki Roboto (dodaj to na pocz¹tku pliku CSS lub w <head> HTML) */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+
+body {
+    margin: 0;
+    font-family: var(--font-family);
+    background-color: var(--background-color);
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+#root {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 2rem;
+    text-align: center;
+}
+
+/* Logo */
+.logo {
+    height: 7em; /* Nieco wiêksze logo */
+    padding: 1.5em;
+    will-change: filter;
+    transition: filter var(--transition-speed) ease-in-out; /* P³ynniejsze przejœcie */
+}
+
+    .logo:hover {
+        filter: drop-shadow(0 0 2em #646cffaa);
+    }
+
+    .logo.react:hover { /* Zak³adaj¹c, ¿e masz logo React */
+        filter: drop-shadow(0 0 2em #61dafbaa);
+    }
+
+@keyframes logo-spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .logo-animated .logo { /* Mo¿esz dodaæ klasê .logo-animated do elementu a, jeœli chcesz animacjê */
+        animation: logo-spin infinite 20s linear;
+    }
+}
+
+/* G³ówny kontener aplikacji */
+.app-root {
+    position: relative; /* To jest w porz¹dku */
+    min-height: 100vh;
+    background-color: var(--background-color);
+    padding-top: 80px; /* Ten padding mo¿e pomóc, aby g³ówna treœæ nie zaczyna³a siê
+                        tu¿ pod sta³ym przyciskiem, daj¹c trochê przestrzeni.
+                        Dostosuj tê wartoœæ wed³ug potrzeb. */
+}
+
+/* Przyciski */
+.btn { /* Klasa bazowa dla przycisków */
+    padding: 10px 20px;
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: background-color var(--transition-speed) ease, transform var(--transition-speed) ease;
+    text-decoration: none; /* Usuñ podkreœlenie jeœli przycisk jest linkiem */
+    display: inline-block; /* Dla prawid³owego paddingu i marginesu */
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: #fff;
+}
+
+    .btn-primary:hover {
+        background-color: var(--primary-color-darker);
+        transform: translateY(-2px); /* Subtelny efekt podniesienia */
+    }
+
+.btn-secondary {
+    background-color: var(--secondary-color);
+    color: #fff;
+}
+
+    .btn-secondary:hover {
+        background-color: var(--secondary-color-darker);
+        transform: translateY(-2px);
+    }
+
+.login-btn {
+    position: fixed; /* Zmiana z absolute na fixed */
+    top: 20px; /* Odstêp od góry viewportu */
+    right: 30px; /* Odstêp od prawej strony viewportu */
+    z-index: 1000;
+}
+.product-card:hover {
+        transform: translateY(-5px); /* Efekt podniesienia karty */
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    }
+
+.product-image-placeholder { /* Dodaj to jeœli masz obrazki produktów */
+    width: 100%;
+    height: 200px; /* Dostosuj wysokoœæ */
+    background-color: #eee; /* Placeholder dla obrazka */
+    border-radius: var(--border-radius) var(--border-radius) 0 0; /* Zaokr¹glenie tylko górnych rogów */
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted-text-color);
+    font-size: 0.9rem;
+    /* background-image: url('link_do_obrazka.jpg'); /* Odkomentuj i ustaw obrazek */
+    /* background-size: cover; */
+    /* background-position: center; */
+}
+
+.product-name {
+    font-size: 1.3rem; /* Nieco wiêksza nazwa produktu */
+    font-weight: 500;
+    margin-bottom: 0.75rem; /* Zmniejszony margines */
+    color: var(--text-color);
+}
+
+.product-description { /* Opcjonalny opis produktu */
+    font-size: 0.9rem;
+    color: var(--muted-text-color);
+    margin-bottom: 1rem;
+    flex-grow: 1; /* Aby opis wype³ni³ dostêpn¹ przestrzeñ */
+}
+
+.product-price { /* Opcjonalna cena produktu */
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--primary-color);
+    margin-bottom: 1.25rem;
+}
+
+.add-to-cart-btn {
+    /* U¿ywa teraz klas .btn i .btn-secondary */
+    width: 100%; /* Przycisk na ca³¹ szerokoœæ karty */
+    margin-top: auto; /* Wypchnij przycisk na dó³ karty, jeœli treœæ jest ró¿nej wysokoœci */
+}
+
+/* Formularz Logowania */
+.login-container {
+    max-width: 400px; /* Nieco szerszy kontener */
+    margin: 80px auto; /* Centrowanie i margines górny */
+    padding: 2.5rem; /* Wiêkszy padding */
+    background: var(--card-background-color);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    text-align: left; /* Wyrównanie do lewej dla lepszej czytelnoœci formularza */
+}
+
+    .login-container h2 { /* Tytu³ w kontenerze logowania */
+        text-align: center;
+        margin-bottom: 2rem;
+        font-size: 1.8rem;
+        color: var(--text-color);
+    }
+
+.login-form .form-group { /* Grupowanie etykiety i pola input */
+    margin-bottom: 1.5rem;
+}
+
+.login-form label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.login-form input[type="text"],
+.login-form input[type="email"],
+.login-form input[type="password"] {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    font-size: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    box-sizing: border-box; /* Aby padding nie zwiêksza³ szerokoœci */
+    transition: border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+}
+
+    .login-form input[type="text"]:focus,
+    .login-form input[type="email"]:focus,
+    .login-form input[type="password"]:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(100, 108, 255, 0.25); /* Efekt focus */
+        outline: none;
+    }
+
+.login-form button {
+    /* U¿ywa teraz klas .btn i .btn-primary */
+    width: 100%;
+    margin-top: 1rem; /* Odstêp od ostatniego pola */
+}
+
+.login-error {
+    color: var(--error-color);
+    margin-top: 1rem;
+    text-align: center; /* Wyœrodkowanie b³êdu */
+    font-size: 0.9rem;
+}
+
+/* Styl dla linku "Read the docs" - jeœli jest potrzebny */
+.read-the-docs {
+    color: var(--muted-text-color);
+    font-size: 0.9rem;
+    margin-top: 2rem;
+    display: block; /* Aby by³ na osobnej linii */
+}
+
+    .read-the-docs:hover {
+        color: var(--primary-color);
+    }
+.page-container {
+    padding: 2rem; /* Dopasuj padding wed³ug potrzeb */
+    background-color: var(--background-color); /* T³o dla kontenera strony, jeœli inne ni¿ body */
+}
+
+.main-content {
+    padding-top: 60px; /* Wysokoœæ paska nawigacyjnego - dostosuj jeœli navbar ma inn¹ wysokoœæ */
+    /* To zapobiega nak³adaniu siê treœci na sta³y navbar, jeœli go takim zrobisz */
+    /* Jeœli navbar nie jest fixed, ten padding mo¿e nie byæ konieczny */
+}
+
+
+.centered-title {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: var(--text-color);
+}
+/* Style dla products-container i product-card (jeœli nie s¹ ju¿ zdefiniowane lub wymagaj¹ dostosowania) */
+.products-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* Responsywna siatka */
+    gap: 2rem; /* Odstêp miêdzy kartami */
+    padding: 1rem 0; /* Padding dla kontenera produktów */
+}
+
+.product-card {
+    background-color: var(--card-background-color); /* T³o karty */
+    border-radius: var(--border-radius); /* Zaokr¹glenie rogów */
+    box-shadow: var(--box-shadow); /* Cieñ karty */
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    text-align: left; /* Wyrównanie tekstu w karcie do lewej */
+    transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease; /* */
+}
+
+    .product-card:hover {
+        transform: translateY(-5px); /* Efekt podniesienia karty */
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15); /* */
+    }
+
+/* Upewnij siê, ¿e klasy przycisków zdefiniowane wczeœniej s¹ nadal odpowiednie */
+/* .btn, .btn-primary, .btn-secondary, .add-to-cart-btn */
+
+/* Dla `add-to-cart-btn` u¿ytego w ProductsComponent.jsx: */
+.add-to-cart-btn {
+    /* U¿ywa teraz klas .btn i .btn-secondary zdefiniowanych globalnie */
+    width: 100%; /* Przycisk na ca³¹ szerokoœæ karty */
+    margin-top: auto; /* Wypchnij przycisk na dó³ karty */
+    padding: 10px 15px; /* Dostosowany padding */
+    font-size: 0.95rem; /* Dostosowany rozmiar czcionki */
+}

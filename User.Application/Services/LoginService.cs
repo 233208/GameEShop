@@ -1,6 +1,4 @@
-﻿using System.Security.Authentication;
-using User.Domain.Exceptions.Login;
-using User.Application.Services;
+﻿using User.Domain.Exceptions.Login;
 namespace User.Application.Services
 {
     public class LoginService : ILoginService

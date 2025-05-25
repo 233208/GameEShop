@@ -1,6 +1,4 @@
 ﻿namespace EShop.Domain.Models;
-using Microsoft.EntityFrameworkCore;
-
 public class SystemRequirements
 {
     public string OS { get; set; } = string.Empty;

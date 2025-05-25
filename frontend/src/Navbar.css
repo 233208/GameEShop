@@ -1,0 +1,45 @@
+.navbar {
+    background-color: #333;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: var(--box-shadow);
+}
+
+.nav-logo {
+    color: var(--primary-color);
+    font-size: 1.8rem;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+    .nav-logo:hover {
+        color: var(--primary-color-darker);
+    }
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    margin: 0;
+    padding: 0;
+}
+
+    .nav-links li {
+        margin-left: 20px;
+    }
+
+    .nav-links a {
+        color: #fff;
+        text-decoration: none;
+        font-size: 1rem;
+        padding: 0.5rem 0.75rem;
+        border-radius: var(--border-radius);
+        transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+    }
+
+        .nav-links a:hover,
+        .nav-links a.active { /* Mo¿esz dodaæ klasê .active programowo dla aktywnego linku */
+            background-color: var(--primary-color);
+            color: #fff;
+        }

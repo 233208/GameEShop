@@ -6,7 +6,7 @@ public class EShopSeeder(DataContext context) : IEShopSeeder
 {
     public async Task Seed()
     {
-        if (!context.Products.Any()) 
+        if (!context.Products.Any())
         {
             var Games = new List<Product>
         {
@@ -78,6 +78,6 @@ public class EShopSeeder(DataContext context) : IEShopSeeder
             context.Products.AddRange(Games);
             context.SaveChanges();
         }
-            
+
     }
 }

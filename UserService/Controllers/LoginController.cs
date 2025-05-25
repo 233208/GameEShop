@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using User.Application.Services;
 using User.Domain.Exceptions.Login;
 using User.Domain.Models.Requests;

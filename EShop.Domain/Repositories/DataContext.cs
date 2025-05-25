@@ -17,35 +17,35 @@ public class DataContext : DbContext
 
         modelBuilder.Entity<Product>()
             .Property(p => p.Rating)
-            .HasPrecision(18, 2); // Ensure precision for Rating
+            .HasPrecision(18, 2);
 
         modelBuilder.Entity<Product>()
             .Property(p => p.Name)
-            .HasColumnType("varchar(255)"); // Use varchar for Name
+            .HasColumnType("varchar(255)");
 
         modelBuilder.Entity<Product>()
             .Property(p => p.Description)
-            .HasColumnType("text"); // Use text for Description
+            .HasColumnType("text");
 
         modelBuilder.Entity<Product>()
             .Property(p => p.Producer)
-            .HasColumnType("varchar(255)"); // Use varchar for Producer
+            .HasColumnType("varchar(255)");
 
         modelBuilder.Entity<Product>()
             .Property(p => p.Publisher)
-            .HasColumnType("varchar(255)"); // Use varchar for Publisher
+            .HasColumnType("varchar(255)");
 
         modelBuilder.Entity<Product>()
             .Property(p => p.Platform)
-            .HasColumnType("varchar(255)"); // Use varchar for Platform
+            .HasColumnType("varchar(255)");
 
         modelBuilder.Entity<Product>()
             .Property(p => p.Year)
-            .HasColumnType("int"); // Use int for Year
+            .HasColumnType("int");
 
         modelBuilder.Entity<Product>()
             .Property(p => p.Genres)
-            .HasColumnType("json"); // Use json for Genres (array of strings)
+            .HasColumnType("json");
 
         modelBuilder.Entity<Product>()
             .OwnsOne(p => p.SystemRequirements, sa =>
