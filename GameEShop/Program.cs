@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Security.Cryptography;
+using User.Domain.Repositories;
 
 namespace EShop
 {
@@ -13,24 +14,24 @@ namespace EShop
     {
         public static async Task Main(string[] args)
         {
+            // Tworzenie buildera aplikacji webowej
             var builder = WebApplication.CreateBuilder(args);
 
+            // Konfiguracja kontekstu bazy danych z u¿yciem SQL Server
             builder.Services.AddDbContext<DataContext>(options =>
-                options.UseMySql(
-                    builder.Configuration.GetConnectionString("DefaultConnection"),
-                    new MySqlServerVersion(new Version(8, 0, 32))
-                ));
+                options.UseSqlServer(
+                    builder.Configuration.GetConnectionString("DefaultConnection"))
+            );
 
-
-
+            // Rejestracja repozytorium i seederów w kontenerze DI
             builder.Services.AddScoped<IRepository, Repository>();
             builder.Services.AddScoped<IEShopSeeder, EShopSeeder>();
             builder.Services.AddScoped<IProductService, ProductService>();
 
-            // Add services to the container.
-
+            // Dodanie kontrolerów do kontenera us³ug
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+            // Konfiguracja Swaggera do dokumentacji API
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(c =>
             {
@@ -45,25 +46,25 @@ namespace EShop
                 });
 
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement()
-      {
-        {
-          new OpenApiSecurityScheme
-          {
-            Reference = new OpenApiReference
-              {
-                Type = ReferenceType.SecurityScheme,
-                Id = "Bearer"
-              },
-              Scheme = "oauth2",
-              Name = "Bearer",
-              In = ParameterLocation.Header,
-
-            },
-            new List<string>()
-          }
-        });
+                {
+                        {
+                            new OpenApiSecurityScheme
+                            {
+                                Reference = new OpenApiReference
+                                {
+                                    Type = ReferenceType.SecurityScheme,
+                                    Id = "Bearer"
+                                },
+                                Scheme = "oauth2",
+                                Name = "Bearer",
+                                In = ParameterLocation.Header,
+                            },
+                            new List<string>()
+                        }
+                });
             });
 
+            // Konfiguracja uwierzytelniania JWT
             builder.Services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -87,14 +88,16 @@ namespace EShop
                 };
             });
 
+            // Konfiguracja autoryzacji z politykami ról
             builder.Services.AddAuthorization(options =>
             {
                 options.AddPolicy("AdminOnly", policy =>
-                    policy.RequireRole("Administrator"));
+                    policy.RequireRole("Admin"));
                 options.AddPolicy("EmployeeOnly", policy =>
                     policy.RequireRole("Employee"));
             });
 
+            // Konfiguracja CORS dla okreœlonego pochodzenia
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("CorsPolicy", policy =>
@@ -105,34 +108,27 @@ namespace EShop
                 });
             });
 
-
-
+            // Budowanie aplikacji
             var app = builder.Build();
 
+            // U¿ycie polityki CORS
             app.UseCors("CorsPolicy");
 
+            // W³¹czenie Swaggera w œrodowisku deweloperskim
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
 
-
-
+            // Middleware uwierzytelniania i autoryzacji
             app.UseAuthentication();
             app.UseAuthorization();
 
-
-
+            // Mapowanie kontrolerów
             app.MapControllers();
 
-
-
-
-
-
-
-
+            // Migracja bazy danych i uruchomienie seeda
             using (var scope = app.Services.CreateScope())
             {
                 var db = scope.ServiceProvider.GetRequiredService<DataContext>();
@@ -141,8 +137,8 @@ namespace EShop
                 await seeder.Seed();
             }
 
+            // Uruchomienie aplikacji
             await app.RunAsync();
-
         }
     }
 }

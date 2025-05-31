@@ -6,19 +6,20 @@ using System.Security.Cryptography;
 using User.Application.Services;
 using User.Application.Settings;
 using User.Domain.Repositories;
-
+using User.Domain.Seeders;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<UserDbContext>(options =>
-             options.UseMySql(
-                 builder.Configuration.GetConnectionString("DefaultConnection"),
-                 new MySqlServerVersion(new Version(8, 0, 32))
-             ));
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("DefaultConnection"))
+);
+
 
 // JWT config
-var jwtSettings = builder.Configuration.GetSection("Jwt");
-builder.Services.Configure<JwtSettings>(jwtSettings);
+var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
+
 
 builder.Services.AddAuthentication(options =>
 {
@@ -47,9 +48,17 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("AdminOnly", policy =>
-        policy.RequireRole("Administrator"));
+        policy.RequireRole("Admin"));
 });
 
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("EmployeeOnly", policy =>
+        policy.RequireRole("Admin", "Employee"));
+});
+
+
+builder.Services.AddScoped<IUserSeeder, UserSeeder>();
 builder.Services.AddScoped<ILoginService, LoginService>();
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 
@@ -134,5 +143,24 @@ app.UseAuthorization();
 app.UseSession();
 
 app.MapControllers();
+
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<UserDbContext>();
+    await db.Database.MigrateAsync();
+    var seeder = scope.ServiceProvider.GetRequiredService<IUserSeeder>();
+    try
+    {
+        await seeder.Seed();
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Seeder error: {ex}");
+        throw;
+    }
+
+}
+
 
 app.Run();

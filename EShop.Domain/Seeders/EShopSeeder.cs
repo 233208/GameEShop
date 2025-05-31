@@ -1,5 +1,6 @@
 ﻿using EShop.Domain.Models;
 using EShop.Domain.Repositories;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 namespace EShop.Domain.Seeders;
 
 public class EShopSeeder(DataContext context) : IEShopSeeder
@@ -12,7 +13,7 @@ public class EShopSeeder(DataContext context) : IEShopSeeder
         {
             new Product
             {
-                Id = 1,
+               
                 Name = "The Witcher 3: Wild Hunt",
                 Description = "An open-world RPG set in a fantasy world.",
                 Year = 2015,
@@ -33,7 +34,7 @@ public class EShopSeeder(DataContext context) : IEShopSeeder
                 Rating = 4.8m
                 },
             new Product
-            { Id = 2,
+            { 
                 Name = "Cyberpunk 2077",
                 Description = "An open-world RPG set in a dystopian future.",
                 Year = 2020,
@@ -54,7 +55,7 @@ public class EShopSeeder(DataContext context) : IEShopSeeder
                 Rating = 4.0m
             },
             new Product
-            { Id = 3,
+            { 
                 Name = "DOOM Eternal",
                 Description = "A first-person shooter game with fast-paced action.",
                 Year = 2020,

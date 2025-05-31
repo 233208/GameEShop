@@ -39,7 +39,7 @@ namespace EShopService.Controllers
         }
 
         // POST api/<ProductController>
-        [Authorize(Policy = "EmployeeOnly")]
+        [Authorize(Roles = "Employee,Admin")]
         [HttpPost]
         public async Task<ActionResult> Post([FromBody] Product product)
         {
@@ -49,7 +49,7 @@ namespace EShopService.Controllers
         }
 
         // PUT api/<ProductController>/5
-        [Authorize(Policy = "EmployeeOnly")]
+        [Authorize(Roles = "Employee,Admin")]
         [HttpPut("{id}")]
         public async Task<ActionResult> Put(int id, [FromBody] Product product)
         {
@@ -59,7 +59,7 @@ namespace EShopService.Controllers
         }
 
         // DELETE api/<ProductController>/5
-        [Authorize(Policy = "EmployeeOnly")]
+        [Authorize(Roles = "Employee,Admin")]
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
@@ -71,7 +71,7 @@ namespace EShopService.Controllers
         }
 
         // PATCH api/<ProductController>/6
-        [Authorize(Policy = "EmployeeOnly")]
+        [Authorize(Roles = "Employee,Admin")]
         [HttpPatch]
         public ActionResult Add([FromBody] Product product)
         {
@@ -79,5 +79,20 @@ namespace EShopService.Controllers
 
             return Ok(result);
         }
+        [HttpGet("get-session")]
+        public IActionResult GetSession()
+        {
+            var username = HttpContext.Session.GetString("Username");
+            var email = HttpContext.Session.GetString("Email");
+            var token = HttpContext.Session.GetString("Token");
+
+            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(token))
+            {
+                return Unauthorized("No active session");
+            }
+
+            return Ok(new { Username = username, Token = token, Email = email });
+        }
+
     }
 }

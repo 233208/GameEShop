@@ -2,17 +2,36 @@
 
 services:
   database:
-    image: mysql:8.0
-    container_name: mysql_db
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: gameeshop_mssql_db
     environment:
-      MYSQL_ROOT_PASSWORD: GameEShop
-      MYSQL_DATABASE: GameEShop
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "GameEShop2024!"
+      MSSQL_PID: "Express"
     ports:
-      - "3306:3306"
+      - "1433:1433"
     volumes:
-      - mysql_volume:/var/lib/mysql
+      - mssql_volume:/var/opt/mssql
     healthcheck:
-      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost", "-uroot", "-pGameEShop"]
+      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P 'GameEShop2024!' -Q 'SELECT 1'"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  user_database:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: user_mssql_db
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "UserGameEShop2024!"
+      MSSQL_PID: "Express"
+    ports:
+      - "1434:1433"
+    volumes:
+      - user_mssql_volume:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P 'UserGameEShop2024!' -Q 'SELECT 1'"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -25,7 +44,7 @@ services:
     container_name: gameeshop_service
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      ConnectionStrings__DefaultConnection: "Server=database;Database=GameEShop;User=root;Password=GameEShop;"
+      ConnectionStrings__DefaultConnection: "Server=database;Database=GameEShop;User Id=sa;Password=GameEShop2024!;TrustServerCertificate=True;"
     depends_on:
       - database
     ports:
@@ -38,9 +57,9 @@ services:
     container_name: user_service
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      ConnectionStrings__DefaultConnection: "Server=database;Database=GameEShop;User=root;Password=GameEShop;"
+      ConnectionStrings__DefaultConnection: "Server=user_database;Database=UserGameEShop;User Id=sa;Password=UserGameEShop2024!;TrustServerCertificate=True;"
     depends_on:
-      - database
+      - user_database
     ports:
       - "5001:8080"
     
@@ -51,7 +70,7 @@ services:
     container_name: cart_service
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      ConnectionStrings__DefaultConnection: "Server=database;Database=GameEShop;User=root;Password=GameEShop;"
+      ConnectionStrings__DefaultConnection: "Server=database;Database=GameEShop;User Id=sa;Password=GameEShop;TrustServerCertificate=True;"
     depends_on:
       - database
       - redis
@@ -82,4 +101,5 @@ services:
       - "6379:6379"
 
 volumes:
-  mysql_volume:
+  mssql_volume:
+  user_mssql_volume:

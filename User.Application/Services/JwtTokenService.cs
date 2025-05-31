@@ -8,11 +8,11 @@ using User.Application.Settings;
 
 public class JwtTokenService : IJwtTokenService
 {
-    private readonly JwtSettings _settings;
+    private readonly JwtSettings _jwtSettings;
 
     public JwtTokenService(IOptions<JwtSettings> settings)
     {
-        _settings = settings.Value;
+        _jwtSettings = settings.Value;
     }
 
     public string GenerateToken(int userId, List<string> roles)
@@ -29,10 +29,10 @@ public class JwtTokenService : IJwtTokenService
         var creds = new SigningCredentials(new RsaSecurityKey(rsa), SecurityAlgorithms.RsaSha256);
 
         var token = new JwtSecurityToken(
-            issuer: _settings.Issuer,
-            audience: _settings.Audience,
+            issuer: _jwtSettings.Issuer,
+            audience: _jwtSettings.Audience,
             claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(_settings.ExpiresInMinutes),
+            expires: DateTime.UtcNow.AddMinutes(_jwtSettings.ExpiresInMinutes),
             signingCredentials: creds);
 
         return new JwtSecurityTokenHandler().WriteToken(token);

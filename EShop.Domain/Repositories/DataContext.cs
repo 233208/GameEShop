@@ -21,23 +21,23 @@ public class DataContext : DbContext
 
         modelBuilder.Entity<Product>()
             .Property(p => p.Name)
-            .HasColumnType("varchar(255)");
+            .HasColumnType("nvarchar(255)");
 
         modelBuilder.Entity<Product>()
             .Property(p => p.Description)
-            .HasColumnType("text");
+            .HasColumnType("nvarchar(max)");
 
         modelBuilder.Entity<Product>()
             .Property(p => p.Producer)
-            .HasColumnType("varchar(255)");
+            .HasColumnType("nvarchar(255)");
 
         modelBuilder.Entity<Product>()
             .Property(p => p.Publisher)
-            .HasColumnType("varchar(255)");
+            .HasColumnType("nvarchar(255)");
 
         modelBuilder.Entity<Product>()
             .Property(p => p.Platform)
-            .HasColumnType("varchar(255)");
+            .HasColumnType("nvarchar(255)");
 
         modelBuilder.Entity<Product>()
             .Property(p => p.Year)
@@ -45,21 +45,16 @@ public class DataContext : DbContext
 
         modelBuilder.Entity<Product>()
             .Property(p => p.Genres)
-            .HasColumnType("json");
+            .HasColumnType("nvarchar(max)");
 
         modelBuilder.Entity<Product>()
             .OwnsOne(p => p.SystemRequirements, sa =>
             {
-                sa.Property(s => s.OS).HasColumnType("varchar(255)");
-                sa.Property(s => s.Processor).HasColumnType("varchar(255)");
-                sa.Property(s => s.Memory).HasColumnType("varchar(255)");
-                sa.Property(s => s.Graphics).HasColumnType("varchar(255)");
-                sa.Property(s => s.Storage).HasColumnType("varchar(255)");
+                sa.Property(s => s.OS).HasColumnType("nvarchar(255)");
+                sa.Property(s => s.Processor).HasColumnType("nvarchar(255)");
+                sa.Property(s => s.Memory).HasColumnType("nvarchar(255)");
+                sa.Property(s => s.Graphics).HasColumnType("nvarchar(255)");
+                sa.Property(s => s.Storage).HasColumnType("nvarchar(255)");
             });
     }
-
-
-
-
-
 }

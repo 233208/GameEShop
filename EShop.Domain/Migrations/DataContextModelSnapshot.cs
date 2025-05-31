@@ -17,9 +17,9 @@ namespace EShop.Domain.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "8.0.15")
-                .HasAnnotation("Relational:MaxIdentifierLength", 64);
+                .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
-            MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("EShop.Domain.Models.Product", b =>
                 {
@@ -27,37 +27,37 @@ namespace EShop.Domain.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<bool>("Deleted")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("bit");
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Genres")
                         .IsRequired()
-                        .HasColumnType("json");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("varchar(255)");
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Platform")
                         .IsRequired()
-                        .HasColumnType("varchar(255)");
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Producer")
                         .IsRequired()
-                        .HasColumnType("varchar(255)");
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Publisher")
                         .IsRequired()
-                        .HasColumnType("varchar(255)");
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<decimal>("Rating")
                         .HasPrecision(18, 2)
@@ -83,23 +83,23 @@ namespace EShop.Domain.Migrations
 
                             b1.Property<string>("Graphics")
                                 .IsRequired()
-                                .HasColumnType("varchar(255)");
+                                .HasColumnType("nvarchar(255)");
 
                             b1.Property<string>("Memory")
                                 .IsRequired()
-                                .HasColumnType("varchar(255)");
+                                .HasColumnType("nvarchar(255)");
 
                             b1.Property<string>("OS")
                                 .IsRequired()
-                                .HasColumnType("varchar(255)");
+                                .HasColumnType("nvarchar(255)");
 
                             b1.Property<string>("Processor")
                                 .IsRequired()
-                                .HasColumnType("varchar(255)");
+                                .HasColumnType("nvarchar(255)");
 
                             b1.Property<string>("Storage")
                                 .IsRequired()
-                                .HasColumnType("varchar(255)");
+                                .HasColumnType("nvarchar(255)");
 
                             b1.HasKey("ProductId");
 

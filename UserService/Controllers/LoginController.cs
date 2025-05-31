@@ -17,11 +17,11 @@ namespace UserService.Controllers
         }
 
         [HttpPost]
-        public IActionResult Login([FromBody] LoginRequest request)
+        public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
             try
             {
-                var token = _loginService.Login(request.Username, request.Password);
+                var token = await _loginService.LoginAsync(request.Username, request.Password);
 
                 HttpContext.Session.SetString("Username", request.Username);
                 HttpContext.Session.SetString("Token", token);
@@ -61,6 +61,5 @@ namespace UserService.Controllers
 
             return Ok("Logged out successfully");
         }
-
     }
 }
