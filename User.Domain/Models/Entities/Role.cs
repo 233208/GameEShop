@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+namespace User.Domain.Models.Entities;
 
 public class Role
 {

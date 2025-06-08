@@ -1,7 +1,6 @@
-﻿namespace User.Application.Services
+﻿namespace User.Application.Services;
+
+public interface IJwtTokenService
 {
-    public interface IJwtTokenService
-    {
-        string GenerateToken(int userId, List<string> roles);
-    }
+    string GenerateToken(int userId, List<string> roles);
 }

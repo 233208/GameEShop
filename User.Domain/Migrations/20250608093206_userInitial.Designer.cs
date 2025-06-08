@@ -12,8 +12,8 @@ using User.Domain.Repositories;
 namespace User.Domain.Migrations
 {
     [DbContext(typeof(UserDbContext))]
-    [Migration("20250529173837_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250608093206_userInitial")]
+    partial class userInitial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,7 +25,22 @@ namespace User.Domain.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Role", b =>
+            modelBuilder.Entity("RoleUser", b =>
+                {
+                    b.Property<int>("RolesId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("RolesId", "UserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserRoles", (string)null);
+                });
+
+            modelBuilder.Entity("User.Domain.Models.Entities.Role", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -43,22 +58,7 @@ namespace User.Domain.Migrations
                     b.ToTable("Roles");
                 });
 
-            modelBuilder.Entity("RoleUsers", b =>
-                {
-                    b.Property<int>("RolesId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UsersId")
-                        .HasColumnType("int");
-
-                    b.HasKey("RolesId", "UsersId");
-
-                    b.HasIndex("UsersId");
-
-                    b.ToTable("UserRoles", (string)null);
-                });
-
-            modelBuilder.Entity("Users", b =>
+            modelBuilder.Entity("User.Domain.Models.Entities.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -100,17 +100,17 @@ namespace User.Domain.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("RoleUsers", b =>
+            modelBuilder.Entity("RoleUser", b =>
                 {
-                    b.HasOne("Role", null)
+                    b.HasOne("User.Domain.Models.Entities.Role", null)
                         .WithMany()
                         .HasForeignKey("RolesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Users", null)
+                    b.HasOne("User.Domain.Models.Entities.User", null)
                         .WithMany()
-                        .HasForeignKey("UsersId")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

@@ -5,6 +5,7 @@ using Microsoft.OpenApi.Models;
 using System.Security.Cryptography;
 using User.Application.Services;
 using User.Application.Settings;
+using User.Domain.Profiles;
 using User.Domain.Repositories;
 using User.Domain.Seeders;
 
@@ -61,6 +62,9 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddScoped<IUserSeeder, UserSeeder>();
 builder.Services.AddScoped<ILoginService, LoginService>();
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
+builder.Services.AddScoped<IUserService, User.Application.Services.UserService>();
+
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

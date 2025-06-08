@@ -8,15 +8,19 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using User.Application.Settings;
 using System.Security.Cryptography;
+using User.Domain.Models.Entities;
+using System.Collections.Concurrent;
 public class LoginService : ILoginService
 {
     private readonly UserDbContext _dbContext;
     private readonly JwtSettings _jwtSettings;
+    protected ConcurrentQueue<int> _userLoggedIdsQueue;
 
     public LoginService(UserDbContext dbContext, IOptions<JwtSettings> jwtSettings)
     {
         _dbContext = dbContext;
         _jwtSettings = jwtSettings.Value;
+        _userLoggedIdsQueue = new ConcurrentQueue<int>();
     }
 
     public async Task<string> LoginAsync(string username, string password)
@@ -28,10 +32,11 @@ public class LoginService : ILoginService
         if (user == null)
             throw new InvalidCredentialsException();
 
+        _userLoggedIdsQueue.Enqueue(user.Id);
         return GenerateToken(user);
     }
 
-    private string GenerateToken(Users user)
+    private string GenerateToken(User.Domain.Models.Entities.User user)
     {
         var claims = new List<Claim>
     {

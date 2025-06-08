@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using User.Domain.Models.Entities;
 
 namespace User.Domain.Repositories
 {
@@ -9,34 +10,34 @@ namespace User.Domain.Repositories
         {
         }
 
-        public DbSet<Users> Users { get; set; }
+        public DbSet<Models.Entities.User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            modelBuilder.Entity<Users>()
+            modelBuilder.Entity<User.Domain.Models.Entities.User>()
                 .HasMany(u => u.Roles)
                 .WithMany()
                 .UsingEntity(j => j.ToTable("UserRoles"));
-            modelBuilder.Entity<Users>()
+            modelBuilder.Entity<User.Domain.Models.Entities.User>()
                 .Property(u => u.Username)
                 .IsRequired()
                 .HasMaxLength(100);
-            modelBuilder.Entity<Users>()
+            modelBuilder.Entity<User.Domain.Models.Entities.User>()
                 .Property(u => u.Email)
                 .IsRequired()
                 .HasMaxLength(255);
-            modelBuilder.Entity<Users>()
+            modelBuilder.Entity<User.Domain.Models.Entities.User>()
                 .Property(u => u.PasswordHash)
                 .IsRequired();
-            modelBuilder.Entity<Users>()
+            modelBuilder.Entity<User.Domain.Models.Entities.User>()
                 .Property(u => u.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP");
-            modelBuilder.Entity<Users>()
+            modelBuilder.Entity<User.Domain.Models.Entities.User>()
                 .Property(u => u.LastLoginAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP");
-            modelBuilder.Entity<Users>()
+            modelBuilder.Entity<User.Domain.Models.Entities.User>()
                 .Property(u => u.IsActive)
                 .HasDefaultValue(true);
             modelBuilder.Entity<Role>()

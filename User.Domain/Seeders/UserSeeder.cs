@@ -1,5 +1,7 @@
-﻿namespace User.Domain.Seeders;
-using User.Domain.Repositories;
+﻿using User.Domain.Repositories;
+using User.Domain.Models.Entities;
+
+namespace User.Domain.Seeders;
 
 public class UserSeeder(UserDbContext dbContext) : IUserSeeder
 {
@@ -7,9 +9,9 @@ public class UserSeeder(UserDbContext dbContext) : IUserSeeder
     {
         if (!dbContext.Users.Any())
         {
-            var Users = new List<Users>
+            var Users = new List<User.Domain.Models.Entities.User>
             {
-                new Users {
+                new User.Domain.Models.Entities.User {
                     
                     Username = "admin",
                     Email = "mateusz.wojcik2003@gmail.com",
@@ -19,7 +21,7 @@ public class UserSeeder(UserDbContext dbContext) : IUserSeeder
                     LastLoginAt = DateTime.UtcNow,
                     IsActive = true
                     },
-                new Users {
+                new User.Domain.Models.Entities.User {
                     
                     Username = "employee",
                     Email = "employee@test.com",
@@ -29,7 +31,7 @@ public class UserSeeder(UserDbContext dbContext) : IUserSeeder
                     LastLoginAt = DateTime.UtcNow,
                     IsActive = true
                     },
-                new Users
+                new User.Domain.Models.Entities.User
                 {
                     Username = "customer",
                     Email = "customer@test.com",
