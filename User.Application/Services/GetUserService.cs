@@ -9,12 +9,12 @@ using User.Domain.Repositories;
 
 namespace User.Application.Services;
 
-public class UserService : IUserService
+public class GetUserService : IGetUserService
 {
     private readonly UserDbContext _dbContext;
     private readonly IMapper _mapper;
 
-    public UserService(UserDbContext dbContext, IMapper mapper)
+    public GetUserService(UserDbContext dbContext, IMapper mapper)
     {
         _dbContext = dbContext;
         _mapper = mapper;

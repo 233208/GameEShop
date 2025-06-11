@@ -10,6 +10,9 @@ using User.Application.Settings;
 using System.Security.Cryptography;
 using User.Domain.Models.Entities;
 using System.Collections.Concurrent;
+using User.Domain.Utils;
+
+
 public class LoginService : ILoginService
 {
     private readonly UserDbContext _dbContext;
@@ -27,9 +30,9 @@ public class LoginService : ILoginService
     {
         var user = await _dbContext.Users
             .Include(u => u.Roles)
-            .FirstOrDefaultAsync(u => u.Username == username && u.PasswordHash == password);
+            .FirstOrDefaultAsync(u => u.Username == username);
 
-        if (user == null)
+        if (user == null || !PasswordHasher.Verify(password, user.PasswordHash))
             throw new InvalidCredentialsException();
 
         _userLoggedIdsQueue.Enqueue(user.Id);

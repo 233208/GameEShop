@@ -7,7 +7,7 @@ using User.Domain.Models.Response;
 
 namespace User.Application.Services;
 
-public interface IUserService
+public interface IGetUserService
 {
     Task<UserResponseDTO>  GetUserAsync(int userId);
 }

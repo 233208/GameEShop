@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Security.Cryptography;
@@ -58,11 +59,12 @@ builder.Services.AddAuthorization(options =>
         policy.RequireRole("Admin", "Employee"));
 });
 
-
+builder.Services.AddScoped<IUserModifyService, UserModifyService>();
+builder.Services.AddScoped<IRegisterService, RegisterService>();
 builder.Services.AddScoped<IUserSeeder, UserSeeder>();
 builder.Services.AddScoped<ILoginService, LoginService>();
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
-builder.Services.AddScoped<IUserService, User.Application.Services.UserService>();
+builder.Services.AddScoped<IGetUserService, GetUserService>();
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 

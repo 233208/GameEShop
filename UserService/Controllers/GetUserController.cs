@@ -9,11 +9,11 @@ namespace UserService.Controllers;
 [Authorize]
 [ApiController]
 [Route("api/[controller]")]
-public class UserController : ControllerBase
+public class GetUserController : ControllerBase
 {
-    private readonly IUserService _userService;
+    private readonly IGetUserService _userService;
 
-    public UserController(IUserService userService)
+    public GetUserController(IGetUserService userService)
     {
         _userService = userService;
     }
