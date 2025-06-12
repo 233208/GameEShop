@@ -1,0 +1,15 @@
+{
+  "profiles": {
+    "NotificationService": {
+      "commandName": "Project",
+      "commandLineArgs": "--port 7187"
+    },
+    "Container (Dockerfile)": {
+      "commandName": "Docker",
+      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}",
+      "containerRunArguments": "--init",
+      "httpPort": 33508,
+      "useSSL": false
+    }
+  }
+}

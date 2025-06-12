@@ -9,6 +9,8 @@ using User.Application.Settings;
 using User.Domain.Profiles;
 using User.Domain.Repositories;
 using User.Domain.Seeders;
+using User.Application.Producer;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -65,6 +67,10 @@ builder.Services.AddScoped<IUserSeeder, UserSeeder>();
 builder.Services.AddScoped<ILoginService, LoginService>();
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 builder.Services.AddScoped<IGetUserService, GetUserService>();
+
+
+builder.Services.AddSingleton<IKafkaProducer, KafkaProducer>();
+
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 

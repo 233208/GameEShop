@@ -11,19 +11,29 @@ using System.Security.Cryptography;
 using User.Domain.Models.Entities;
 using System.Collections.Concurrent;
 using User.Domain.Utils;
+using User.Application.Producer;
+using System.Threading.Tasks;
+using System;
+using System.Collections.Generic;
 
+// Usunięto zbędne usingi dla KafkaMessage i JsonSerializer
+// using NotificationService;
+// using System.Text.Json; 
 
 public class LoginService : ILoginService
 {
     private readonly UserDbContext _dbContext;
     private readonly JwtSettings _jwtSettings;
+    private readonly IKafkaProducer _kafkaProducer;
+
     protected ConcurrentQueue<int> _userLoggedIdsQueue;
 
-    public LoginService(UserDbContext dbContext, IOptions<JwtSettings> jwtSettings)
+    public LoginService(UserDbContext dbContext, IOptions<JwtSettings> jwtSettings, IKafkaProducer kafkaProducer)
     {
         _dbContext = dbContext;
         _jwtSettings = jwtSettings.Value;
         _userLoggedIdsQueue = new ConcurrentQueue<int>();
+        _kafkaProducer = kafkaProducer;
     }
 
     public async Task<string> LoginAsync(string username, string password)
@@ -36,17 +46,26 @@ public class LoginService : ILoginService
             throw new InvalidCredentialsException();
 
         _userLoggedIdsQueue.Enqueue(user.Id);
+
+
+        var messageKey = user.Email;
+        var messageValue = $"Witaj {user.Username}, zalogowales sie do GameEShop!";
+
+        await _kafkaProducer.SendMessageAsync("after-login-email-topic", $"{messageKey}:{messageValue}");
+
+
+
         return GenerateToken(user);
     }
 
     private string GenerateToken(User.Domain.Models.Entities.User user)
     {
         var claims = new List<Claim>
-    {
-        new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-        new Claim(JwtRegisteredClaimNames.UniqueName, user.Username),
-        new Claim(JwtRegisteredClaimNames.Email, user.Email)
-    };
+        {
+            new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+            new Claim(JwtRegisteredClaimNames.UniqueName, user.Username),
+            new Claim(JwtRegisteredClaimNames.Email, user.Email)
+        };
 
         if (user.Roles != null)
         {
@@ -56,7 +75,6 @@ public class LoginService : ILoginService
             }
         }
 
-        // Load RSA private key from PEM file
         var rsa = RSA.Create();
         rsa.ImportFromPem(File.ReadAllText("./data/private.key"));
         var creds = new SigningCredentials(new RsaSecurityKey(rsa), SecurityAlgorithms.RsaSha256);
@@ -71,5 +89,4 @@ public class LoginService : ILoginService
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
-
 }

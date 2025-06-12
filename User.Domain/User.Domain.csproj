@@ -21,4 +21,8 @@
     <Folder Include="Migrations\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\NotificationService\NotificationService.csproj" />
+  </ItemGroup>
+
 </Project>
