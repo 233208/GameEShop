@@ -364,3 +364,8 @@ FodyWeavers.xsd
 
 EShop.Domain/Migrations/
 UserService\data\private.key
+
+private.key
+.env
+/.env
+/UserService/data/private.key
