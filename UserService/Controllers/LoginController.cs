@@ -54,7 +54,6 @@ public class LoginController : ControllerBase
         var token = HttpContext.Session.GetString("Token");
         if (!string.IsNullOrEmpty(token))
         {
-            // Blacklist the token in Redis
             HttpContext.Session.Remove("Token");
             HttpContext.Session.Remove("Username");
         }

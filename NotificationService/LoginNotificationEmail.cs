@@ -29,11 +29,9 @@ public class LoginNotificationEmail
 
         try
         {
-            // Parse the JSON message
             using var doc = JsonDocument.Parse(message);
             var root = doc.RootElement;
 
-            // Get the "Value" property
             if (root.TryGetProperty("Value", out var valueElement))
             {
                 var value = valueElement.GetString();
@@ -88,7 +86,6 @@ public class LoginNotificationEmail
 
             int smtpPort = int.Parse(smtpPortStr);
 
-            // Sanitize email addresses
             toEmail = toEmail.Trim().Replace("\"", "");
             smtpUsername = smtpUsername.Trim().Replace("\"", "");
 

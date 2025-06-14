@@ -10,12 +10,12 @@ namespace UserService.Controllers;
 public class RegisterController : ControllerBase
 {
     private readonly IRegisterService _registerService;
-    private readonly ILogger<RegisterController> _logger; // Dodajemy logger
+    private readonly ILogger<RegisterController> _logger; 
 
-    public RegisterController(IRegisterService registerService, ILogger<RegisterController> logger) // Dodajemy logger
+    public RegisterController(IRegisterService registerService, ILogger<RegisterController> logger) 
     {
         _registerService = registerService;
-        _logger = logger; // Dodajemy logger
+        _logger = logger; 
     }
 
     [HttpPost]
@@ -29,12 +29,10 @@ public class RegisterController : ControllerBase
             await _registerService.RegisterAsync(request.Username, request.Email, request.Password);
             return Ok(new { message = "Registration successful." });
         }
-        catch (Exception ex) // Zmieniamy blok catch, aby logować szczegóły
+        catch (Exception ex) 
         {
-            // Logujemy pełny wyjątek, włączając wewnętrzne wyjątki
             _logger.LogError(ex, "An error occurred during registration. Full exception: {Exception}", ex.ToString());
 
-            // Zwracamy błąd 500 z komunikatem, aby test nadal go wyłapywał, ale w logach będziemy mieli szczegóły
             return StatusCode(500, new { error = "An error occurred during registration. Check logs for details." });
         }
     }

@@ -1,5 +1,5 @@
 ﻿using Confluent.Kafka;
-using Microsoft.Extensions.Configuration; // Dodaj ten using
+using Microsoft.Extensions.Configuration; 
 using Microsoft.Extensions.Logging;
 using User.Application.Producer;
 
@@ -8,10 +8,9 @@ public class KafkaProducer : IKafkaProducer
     private readonly IProducer<Null, string> _producer;
     private readonly ILogger<KafkaProducer> _logger;
 
-    // Zmieniamy konstruktor, aby przyjmował IConfiguration
+
     public KafkaProducer(ILogger<KafkaProducer> logger, IConfiguration configuration)
     {
-        // Pobieramy adres serwera z konfiguracji, z wartością domyślną
         var bootstrapServers = configuration.GetValue<string>("Kafka:BootstrapServers") ?? "kafka:9092";
 
         var config = new ProducerConfig

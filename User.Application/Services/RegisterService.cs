@@ -24,16 +24,13 @@ namespace User.Application.Services
         }
         public async Task<User.Domain.Models.Entities.User> RegisterAsync(string username, string email, string password)
         {
-            // Check if user already exists
             if (_dbContext.Users.Any(u => u.Username == username || u.Email == email))
             {
                 throw new InvalidOperationException("Username or email already exists.");
             }
 
-            // Hash the password (simple example, use a secure hasher in production)
             string passwordHash = PasswordHasher.Hash(password);
 
-            // Create user entity
             var user = new User.Domain.Models.Entities.User
             {
                 Username = username,
@@ -43,14 +40,12 @@ namespace User.Application.Services
                 IsActive = true
             };
 
-            // Optionally assign default role
             var defaultRole = _dbContext.Roles.FirstOrDefault(r => r.Name == "Customer");
             if (defaultRole != null)
             {
                 user.Roles = new List<Role> { defaultRole };
             }
 
-            // Add and save
             _dbContext.Users.Add(user);
             await _dbContext.SaveChangesAsync();
 

@@ -31,12 +31,10 @@ public class CartController : ControllerBase
         }
         catch (InvalidOperationException ex)
         {
-            // Zwracamy błąd 400 Bad Request z informacją o problemie
             return BadRequest(new { message = ex.Message });
         }
         catch (Exception ex)
         {
-            // Obsługa innych, nieprzewidzianych błędów
             return NotFound(new { message = ex.Message });
         }
     }

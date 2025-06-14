@@ -2,6 +2,9 @@
 using CartService.Domain.Repositories;
 using System.Text.Json;
 using CartApplication.Producer;
+using System.Net.Http.Json;
+using System.Net.Http.Headers;
+using Microsoft.AspNetCore.Http; 
 
 
 namespace CartService.Application.Services;
@@ -11,17 +14,18 @@ public class CartService : ICartService
     private readonly ICartRepository _cartRepository;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IKafkaProducer _kafkaProducer;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public CartService(ICartRepository cartRepository, IHttpClientFactory httpClientFactory, IKafkaProducer kafkaProducer)
+    public CartService(ICartRepository cartRepository, IHttpClientFactory httpClientFactory, IKafkaProducer kafkaProducer, IHttpContextAccessor httpContextAccessor) 
     {
         _cartRepository = cartRepository;
         _httpClientFactory = httpClientFactory;
         _kafkaProducer = kafkaProducer;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     public async Task<IEnumerable<CartItemDTO>> AddItemToCartAsync(string userId, AddToCartRequest item)
     {
-        // 1. Pobierz dane produktu, w tym stan magazynowy
         var client = _httpClientFactory.CreateClient();
         var response = await client.GetAsync($"http://gameeshop:8080/api/product/{item.ProductId}");
         if (!response.IsSuccessStatusCode)
@@ -37,25 +41,26 @@ public class CartService : ICartService
             throw new Exception("Could not retrieve product information.");
         }
 
-        // 2. Pobierz aktualny koszyk
+        if (product.Deleted)
+        {
+            throw new InvalidOperationException("This product is no longer available.");
+        }
+
         var cart = await _cartRepository.GetCartAsync(userId);
 
-        // 3. Sprawdź, ile tego produktu jest już w koszyku
         var currentQuantityInCart = cart.Items
             .FirstOrDefault(i => i.ProductId == item.ProductId)?.Quantity ?? 0;
 
-        // 4. NOWA LOGIKA: Sprawdź, czy można dodać produkt
         if ((currentQuantityInCart + item.Quantity) > product.Stock)
         {
-            // Rzuć wyjątek, jeśli stan magazynowy jest niewystarczający
             throw new InvalidOperationException($"Not enough items in stock for product '{product.Name}'. Available: {product.Stock}, In cart: {currentQuantityInCart}, Requested: {item.Quantity}.");
         }
 
-        // 5. Jeśli walidacja przeszła pomyślnie, dodaj produkt
         cart.AddItem(item.ProductId, item.Quantity, product.Name);
-        await _cartRepository.UpdateCartAsync(cart);
 
-        return cart.Items.Select(i => new CartItemDTO { ProductId = i.ProductId, Name = i.Name, Quantity = i.Quantity });
+        var updatedCart = await _cartRepository.UpdateCartAsync(cart);
+
+        return updatedCart.Items.Select(i => new CartItemDTO { ProductId = i.ProductId, Name = i.Name, Quantity = i.Quantity });
     }
     public async Task<IEnumerable<CartItemDTO>> GetCartAsync(string userId)
     {
@@ -79,7 +84,43 @@ public class CartService : ICartService
             throw new InvalidOperationException("Cart is empty.");
         }
 
-        // Przygotuj wiadomość do Kafki
+        var client = _httpClientFactory.CreateClient();
+
+        var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString();
+        if (string.IsNullOrEmpty(token))
+        {
+            throw new InvalidOperationException("Authorization token not found in the request.");
+        }
+        client.DefaultRequestHeaders.Authorization = AuthenticationHeaderValue.Parse(token);
+
+
+        foreach (var item in cart.Items)
+        {
+            var productResponse = await client.GetAsync($"http://gameeshop:8080/api/product/{item.ProductId}");
+            if (!productResponse.IsSuccessStatusCode)
+            {
+                throw new Exception($"Product with ID {item.ProductId} not found. Cannot finalize order.");
+            }
+
+            var productJson = await productResponse.Content.ReadAsStringAsync();
+            var product = JsonSerializer.Deserialize<ProductDetailDTO>(productJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+            if (product == null)
+            {
+                throw new Exception($"Failed to deserialize product with ID {item.ProductId}.");
+            }
+
+            if (product.Stock < item.Quantity)
+            {
+                throw new InvalidOperationException($"Not enough stock for product '{product.Name}'. Order cannot be finalized.");
+            }
+            product.Stock -= item.Quantity;
+
+
+            var updateResponse = await client.PutAsJsonAsync($"http://gameeshop:8080/api/product/{item.ProductId}", product);
+            updateResponse.EnsureSuccessStatusCode(); 
+        }
+
         var messagePayload = new
         {
             Email = userEmail,
@@ -87,7 +128,7 @@ public class CartService : ICartService
         };
         var message = JsonSerializer.Serialize(messagePayload);
 
-        // Wyślij wiadomość i wyczyść koszyk
+
         await _kafkaProducer.SendMessageAsync("cart-finalization-topic", message);
         await _cartRepository.ClearCartAsync(userId);
     }

@@ -128,27 +128,14 @@ public class Program
             options.Cookie.IsEssential = true;
         });
 
-        builder.Services.AddCors(options =>
-        {
-            options.AddPolicy("AllowFrontend",
-                policy =>
-                {
-                    policy.WithOrigins("http://localhost:64452") // your frontend origin
-                          .AllowAnyHeader()
-                          .AllowAnyMethod()
-                          .AllowCredentials();
-                });
-        });
 
         var app = builder.Build();
 
-        // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
             app.UseSwagger();
             app.UseSwaggerUI();
         }
-        app.UseCors("AllowFrontend");
         app.UseHttpsRedirection();
 
         app.UseAuthentication();

@@ -97,22 +97,12 @@ namespace EShop
                     policy.RequireRole("Employee"));
             });
 
-            // Konfiguracja CORS dla okreœlonego pochodzenia
-            builder.Services.AddCors(options =>
-            {
-                options.AddPolicy("CorsPolicy", policy =>
-                {
-                    policy.WithOrigins("http://localhost:64452")
-                          .AllowAnyHeader()
-                          .AllowAnyMethod();
-                });
-            });
+
 
             // Budowanie aplikacji
             var app = builder.Build();
 
-            // U¿ycie polityki CORS
-            app.UseCors("CorsPolicy");
+
 
             // W³¹czenie Swaggera w œrodowisku deweloperskim
             if (app.Environment.IsDevelopment())

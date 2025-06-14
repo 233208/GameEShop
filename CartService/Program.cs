@@ -15,43 +15,23 @@ namespace CartService
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // --- Rejestracja Us³ug ---
 
-            // 1. Konfiguracja Magazynu Koszyka (Redis)
+            builder.Services.AddHttpContextAccessor();
             builder.Services.AddStackExchangeRedisCache(options =>
             {
-                // Adres serwera Redis pobierany z docker-compose
                 options.Configuration = "redis:6379";
                 options.InstanceName = "Cart_";
             });
 
-            // 2. Repozytorium i Serwis Aplikacji
-            // Rejestrujemy nasze implementacje z warstwy Application
             builder.Services.AddSingleton<IKafkaProducer, KafkaProducer>();
             builder.Services.AddScoped<ICartRepository, RedisCartRepository>();
             builder.Services.AddScoped<ICartService, CartService.Application.Services.CartService>();
 
-            // 3. Konfiguracja HttpClient dla komunikacji miêdzy serwisami
             builder.Services.AddHttpClient();
 
-            // 4. Konfiguracja API
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
 
-            // 5. Konfiguracja CORS
-            builder.Services.AddCors(options =>
-            {
-                options.AddPolicy("CorsPolicy", policy =>
-                {
-                    // U¿yj adresu z konfiguracji lub wartoœci domyœlnej
-                    var frontendUrl = builder.Configuration["FrontendUrl"] ?? "http://localhost:5173";
-                    policy.WithOrigins(frontendUrl)
-                          .AllowAnyHeader()
-                          .AllowAnyMethod();
-                });
-            });
-
-            // 6. Konfiguracja Uwierzytelniania JWT
             builder.Services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -73,13 +53,11 @@ namespace CartService
                     ValidAudience = "Eshop",
                     IssuerSigningKey = publicKey
                 };
-                options.RequireHttpsMetadata = false; // Dla œrodowiska deweloperskiego
+                options.RequireHttpsMetadata = false; 
             });
 
-            // 7. Konfiguracja Autoryzacji
             builder.Services.AddAuthorization();
 
-            // 8. Konfiguracja Swaggera
             builder.Services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Cart API", Version = "v1" });
@@ -107,11 +85,10 @@ namespace CartService
                 });
             });
 
-            // --- Budowanie Aplikacji ---
+
             var app = builder.Build();
 
-            // --- Konfiguracja Pipeline HTTP ---
-            app.UseCors("CorsPolicy");
+
 
             if (app.Environment.IsDevelopment())
             {
@@ -124,7 +101,6 @@ namespace CartService
 
             app.MapControllers();
 
-            // Uruchomienie aplikacji (bez migracji, bo nie ma bazy danych)
             await app.RunAsync();
         }
     }

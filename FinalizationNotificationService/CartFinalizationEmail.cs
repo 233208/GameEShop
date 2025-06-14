@@ -18,7 +18,6 @@ public class CartFinalizationEmail
         _logger = logger;
     }
 
-    // Definicja DTO dla wiadomoœci z koszyka
     private class CartItem
     {
         public string Name { get; set; }
@@ -37,17 +36,15 @@ public class CartFinalizationEmail
             "kafka:9092",
             "cart-finalization-topic",
             ConsumerGroup = "functions-cart-finalization-group")]
-        string kafkaMessageWrapper) // Zmieniono nazwê dla jasnoœci
+        string kafkaMessageWrapper) 
     {
         _logger.LogInformation($"Received raw Kafka message: {kafkaMessageWrapper}");
 
         try
         {
-            // KROK 1: Sparsuj zewnêtrzny obiekt wiadomoœci z Kafki
             using var doc = JsonDocument.Parse(kafkaMessageWrapper);
             var root = doc.RootElement;
 
-            // KROK 2: Wyci¹gnij zawartoœæ z pola "Value"
             if (!root.TryGetProperty("Value", out var valueElement) || valueElement.ValueKind == JsonValueKind.Null)
             {
                 _logger.LogError("Kafka message is missing 'Value' property or it is null.");
@@ -57,7 +54,6 @@ public class CartFinalizationEmail
             string cartJson = valueElement.GetString();
             _logger.LogInformation($"Extracted cart data from 'Value': {cartJson}");
 
-            // KROK 3: Zdeserializuj w³aœciw¹ wiadomoœæ o koszyku
             var message = JsonSerializer.Deserialize<CartFinalizationMessage>(cartJson, new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
@@ -69,7 +65,6 @@ public class CartFinalizationEmail
                 return;
             }
 
-            // KROK 4: Sformatuj i wyœlij e-mail (bez zmian)
             var emailBody = new StringBuilder();
             emailBody.AppendLine("Thank you for your order in GameEShop!");
             emailBody.AppendLine("You have ordered:");
@@ -93,7 +88,6 @@ public class CartFinalizationEmail
         }
     }
 
-    // Ta funkcja pomocnicza pozostaje bez zmian
     static async Task SendEmailAsync(string subject, string body, string toEmail)
     {
         try

@@ -48,7 +48,7 @@ public class PasswordResetEmail
             string subject = "Your new password for GameEShop";
             string body = $"Hello,\n\nYour new temporary password is: {message.NewPassword}\n\nPlease log in and change it as soon as possible.\n\nBest regards,\nThe GameEShop Team";
 
-            // To wywo³anie jest teraz poprawne
+
             await SendEmailAsync(subject, body, message.Email);
         }
         catch (Exception ex)
@@ -57,7 +57,6 @@ public class PasswordResetEmail
         }
     }
 
-    // --- POPRAWIONA FUNKCJA POMOCNICZA ---
     static async Task SendEmailAsync(string subject, string body, string toEmail)
     {
         try
@@ -89,8 +88,8 @@ public class PasswordResetEmail
                 var mailMessage = new MailMessage
                 {
                     From = new MailAddress(smtpUsername),
-                    Subject = subject, // Poprawione: u¿ywa przekazanego tematu
-                    Body = body,       // Poprawione: u¿ywa przekazanej treœci
+                    Subject = subject,
+                    Body = body,       
                     IsBodyHtml = false
                 };
                 mailMessage.To.Add(toEmail);

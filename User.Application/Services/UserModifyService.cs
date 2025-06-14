@@ -51,7 +51,6 @@ public class UserModifyService : IUserModifyService
 
         if (user == null) return null;
 
-        // Logika została uproszczona, ponieważ `isActive` zawsze będzie miało wartość
         user.IsActive = isActive;
 
         await _dbContext.SaveChangesAsync();

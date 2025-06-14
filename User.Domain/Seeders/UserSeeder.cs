@@ -17,7 +17,6 @@ public class UserSeeder : IUserSeeder
 
     public async Task Seed()
     {
-        // Krok 1: Jeśli w bazie nie ma żadnych ról, dodaj je.
         if (!await _dbContext.Roles.AnyAsync())
         {
             var roles = new List<Role>
@@ -30,7 +29,6 @@ public class UserSeeder : IUserSeeder
             await _dbContext.SaveChangesAsync();
         }
 
-        // Krok 2: Jeśli w bazie nie ma żadnych użytkowników, dodaj ich.
         if (!await _dbContext.Users.AnyAsync()) 
         {
             var adminRole = await _dbContext.Roles.FirstAsync(r => r.Name == "Admin");
@@ -43,19 +41,19 @@ public class UserSeeder : IUserSeeder
                     Username = "admin",
                     Email = "mateusz.wojcik2003@gmail.com",
                     PasswordHash = PasswordHasher.Hash("admin"),
-                    Roles = new List<Role> { adminRole } // Przypisujemy istniejącą rolę
+                    Roles = new List<Role> { adminRole } 
                 },
                 new User.Domain.Models.Entities.User {
                     Username = "employee",
                     Email = "employee@test.com",
                     PasswordHash = PasswordHasher.Hash("employee"),
-                    Roles = new List<Role> { employeeRole } // Przypisujemy istniejącą rolę
+                    Roles = new List<Role> { employeeRole } 
                 },
                 new User.Domain.Models.Entities.User {
                     Username = "customer",
                     Email = "customer@test.com",
                     PasswordHash = PasswordHasher.Hash("customer"),
-                    Roles = new List<Role> { customerRole } // Przypisujemy istniejącą rolę
+                    Roles = new List<Role> { customerRole } 
                 }
             };
 

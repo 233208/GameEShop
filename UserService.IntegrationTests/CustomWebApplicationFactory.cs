@@ -1,10 +1,10 @@
 ﻿using DotNet.Testcontainers.Builders;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.AspNetCore.TestHost; // <--- DODAJ TEN USING
+using Microsoft.AspNetCore.TestHost; 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection; // <--- DODAJ TEN USING
+using Microsoft.Extensions.DependencyInjection; 
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Testcontainers.Kafka;
 using Testcontainers.MsSql;
@@ -52,15 +52,12 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>, IAsyn
         var kafkaPort = _kafkaContainer.GetMappedPublicPort(KafkaBuilder.KafkaPort);
         KafkaBootstrapServers = $"{_kafkaContainer.Hostname}:{kafkaPort}";
 
-        // Używamy scope, aby poprawnie pobrać serwisy
         using var scope = Services.CreateScope();
         var services = scope.ServiceProvider;
 
-        // Migracja bazy danych
         var dbContext = services.GetRequiredService<UserDbContext>();
         await dbContext.Database.MigrateAsync();
 
-        // Pobieramy seeder z kontenera DI i uruchamiamy go
         var seeder = services.GetRequiredService<IUserSeeder>();
         await seeder.Seed();
 

@@ -35,25 +35,6 @@ services:
       retries: 5
       start_period: 30s
 
-  cart_database:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: cart_mssql_db
-    environment:
-      ACCEPT_EULA: "Y"
-      SA_PASSWORD: "CartGameEShop2024!"
-      MSSQL_PID: "Express"
-    ports:
-      - "1435:1433"
-    volumes:
-      - cart_mssql_volume:/var/opt/mssql
-    healthcheck:
-      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P 'CartGameEShop2024!' -Q 'SELECT 1'"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
-
-
   gameeshop:
     build:
       context: .
@@ -93,22 +74,6 @@ services:
       - redis
     ports:
       - "5002:8080"
-
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: frontend
-    ports:
-      - "5173:5173"
-    depends_on:
-      - gameeshop
-      - user
-      - cart
-    environment:
-      - VITE_API_URL=http://gameeshop:8080
-      - VITE_USER_API_URL=http://user:8080
-      - VITE_CART_API_URL=http://cart:8080
   
   notificationservice:
     image: ${DOCKER_REGISTRY-}notificationservice

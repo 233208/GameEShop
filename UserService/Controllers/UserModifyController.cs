@@ -18,7 +18,6 @@ namespace UserService.Controllers
             _userModifyService = userModifyService;
         }
 
-        // NOWY ENDPOINT: Zmiana e-maila
         [HttpPut("self/email")]
         public async Task<IActionResult> UpdateOwnEmail([FromBody] UpdateEmailRequest request)
         {
@@ -32,11 +31,10 @@ namespace UserService.Controllers
             }
             catch (InvalidOperationException ex)
             {
-                return Conflict(new { message = ex.Message }); // 409 Conflict, np. gdy e-mail zajęty
+                return Conflict(new { message = ex.Message }); 
             }
         }
 
-        // NOWY ENDPOINT: Zmiana hasła
         [HttpPut("self/password")]
         public async Task<IActionResult> UpdateOwnPassword([FromBody] UpdatePasswordRequest request)
         {
@@ -50,11 +48,10 @@ namespace UserService.Controllers
             }
             catch (InvalidOperationException ex)
             {
-                return BadRequest(new { message = ex.Message }); // 400 Bad Request, np. gdy stare hasło jest błędne
+                return BadRequest(new { message = ex.Message }); 
             }
         }
 
-        // Ten endpoint pozostaje bez zmian
         [HttpPut("{id}/status")]
         [Authorize(Roles = "Admin,Employee")]
         public async Task<ActionResult<User.Domain.Models.Entities.User>> UpdateUserStatus(int id, [FromBody] UpdateUserStatusRequest request)
@@ -65,7 +62,6 @@ namespace UserService.Controllers
             return Ok(user);
         }
 
-        // Ten endpoint pozostaje bez zmian
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteUser(int id)
@@ -75,10 +71,6 @@ namespace UserService.Controllers
                 return NotFound();
             return NoContent();
         }
-    
-
-    // Definicje DTO, które dodaliśmy w kroku 1
-
     public class UpdateEmailRequest
     {
         [Required]
@@ -102,7 +94,6 @@ namespace UserService.Controllers
     }
 }
 
-// DTO for user updating their own email
 public class UpdateEmailRequest
     {
         [Required]
@@ -110,7 +101,6 @@ public class UpdateEmailRequest
         public string NewEmail { get; set; }
     }
 
-    // DTO for user updating their own password
     public class UpdatePasswordRequest
     {
         [Required]
@@ -121,7 +111,6 @@ public class UpdateEmailRequest
         public string NewPassword { get; set; }
     }
 
-    // Ten DTO pozostaje bez zmian
     public class UpdateUserStatusRequest
     {
         public bool IsActive { get; set; }

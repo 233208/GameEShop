@@ -2,8 +2,7 @@
 using EShop.Domain.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+using System.ComponentModel.DataAnnotations;
 
 namespace EShopService.Controllers
 {
@@ -11,87 +10,76 @@ namespace EShopService.Controllers
     [ApiController]
     public class ProductController : ControllerBase
     {
-        private IProductService _productService;
+        private readonly IProductService _productService;
         public ProductController(IProductService productService)
         {
             _productService = productService;
         }
 
-        // GET: api/<ProductController>
+        // GET: api/Product
         [HttpGet]
-        public async Task<ActionResult> Get()
+        public async Task<ActionResult<List<Product>>> Get()
         {
             var result = await _productService.GetAllAsync();
             return Ok(result);
         }
 
-        // GET api/<ProductController>/5
+        // GET api/Product/5
         [HttpGet("{id}")]
-        public async Task<ActionResult> Get(int id)
+        public async Task<ActionResult<Product>> Get(int id)
         {
             var result = await _productService.GetAsync(id);
             if (result == null)
             {
                 return NotFound();
             }
-
             return Ok(result);
         }
 
-        // POST api/<ProductController>
+        // POST api/Product
         [Authorize(Roles = "Employee,Admin")]
         [HttpPost]
-        public async Task<ActionResult> Post([FromBody] Product product)
+        public async Task<ActionResult<Product>> Post([FromBody] Product product)
         {
             var result = await _productService.AddAsync(product);
-
-            return Ok(result);
+            return CreatedAtAction(nameof(Get), new { id = result.Id }, result); // Lepsza praktyka REST - zwraca 201 Created
         }
 
-        // PUT api/<ProductController>/5
+        // PUT api/Product/5
         [Authorize(Roles = "Employee,Admin")]
         [HttpPut("{id}")]
-        public async Task<ActionResult> Put(int id, [FromBody] Product product)
+        public async Task<ActionResult<Product>> Put(int id, [FromBody] Product product)
         {
+            if (id != product.Id)
+            {
+                return BadRequest("Product ID in URL must match Product ID in body.");
+            }
             var result = await _productService.UpdateAsync(product);
-
             return Ok(result);
         }
 
-        // DELETE api/<ProductController>/5
+        /// <summary>
+        /// DTO for updating product status
+        /// </summary>
+        public class UpdateProductStatusRequest
+        {
+            [Required]
+            public bool IsDeleted { get; set; }
+        }
+
+        // PATCH api/Product/5/status
         [Authorize(Roles = "Employee,Admin")]
-        [HttpDelete("{id}")]
-        public async Task<ActionResult> Delete(int id)
+        [HttpPatch("{id}/status")]
+        public async Task<ActionResult> UpdateProductStatus(int id, [FromBody] UpdateProductStatusRequest request)
         {
             var product = await _productService.GetAsync(id);
-            product.Deleted = true;
-            var result = await _productService.UpdateAsync(product);
-
-            return Ok(result);
-        }
-
-        // PATCH api/<ProductController>/6
-        [Authorize(Roles = "Employee,Admin")]
-        [HttpPatch]
-        public ActionResult Add([FromBody] Product product)
-        {
-            var result = _productService.Add(product);
-
-            return Ok(result);
-        }
-        [HttpGet("get-session")]
-        public IActionResult GetSession()
-        {
-            var username = HttpContext.Session.GetString("Username");
-            var email = HttpContext.Session.GetString("Email");
-            var token = HttpContext.Session.GetString("Token");
-
-            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(token))
+            if (product == null)
             {
-                return Unauthorized("No active session");
+                return NotFound();
             }
-
-            return Ok(new { Username = username, Token = token, Email = email });
+            product.Deleted = request.IsDeleted;
+            var result = await _productService.UpdateAsync(product);
+            return Ok(result);
         }
 
     }

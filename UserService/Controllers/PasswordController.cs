@@ -29,7 +29,6 @@ public class PasswordController : ControllerBase
 
         await _passwordService.RequestPasswordResetAsync(request.Email);
 
-        // Zawsze zwracaj tę samą, ogólną odpowiedź, aby chronić prywatność użytkowników.
         return Ok(new { message = "If an account with this email exists, password reset instructions have been sent." });
     }
 }
