@@ -10,8 +10,8 @@ namespace User.Domain.Repositories
         {
         }
 
-        public DbSet<Models.Entities.User> Users { get; set; }
-        public DbSet<Role> Roles { get; set; }
+        public virtual DbSet<Models.Entities.User> Users { get; set; }
+        public virtual DbSet<Role> Roles { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

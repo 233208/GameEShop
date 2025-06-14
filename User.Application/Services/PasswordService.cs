@@ -1,0 +1,44 @@
+﻿using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
+using User.Application.Producer;
+using User.Domain.Repositories;
+using User.Domain.Utils;
+
+namespace User.Application.Services;
+
+public class PasswordService : IPasswordService
+{
+    private readonly UserDbContext _dbContext;
+    private readonly IKafkaProducer _kafkaProducer;
+
+    public PasswordService(UserDbContext dbContext, IKafkaProducer kafkaProducer)
+    {
+        _dbContext = dbContext;
+        _kafkaProducer = kafkaProducer;
+    }
+
+    public async Task RequestPasswordResetAsync(string email)
+    {
+        var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == email);
+
+        // WAŻNE: Jeśli użytkownik nie istnieje, nic nie robimy.
+        // To zabezpieczenie przed próbami odgadnięcia, które e-maile są w systemie.
+        if (user == null)
+        {
+            return;
+        }
+
+        // 1. Wygeneruj nowe hasło
+        var newPassword = PasswordGenerator.GenerateRandomPassword();
+
+        // 2. Zahaszuj nowe hasło i zaktualizuj użytkownika w bazie
+        user.PasswordHash = PasswordHasher.Hash(newPassword);
+        await _dbContext.SaveChangesAsync();
+
+        // 3. Przygotuj i wyślij wiadomość do Kafki z nowym, niezaszyfrowanym hasłem
+        var messagePayload = new { user.Email, NewPassword = newPassword };
+        var messageJson = JsonSerializer.Serialize(messagePayload);
+
+        await _kafkaProducer.SendMessageAsync("password-reset-topic", messageJson);
+    }
+}

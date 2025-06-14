@@ -35,6 +35,25 @@ services:
       retries: 5
       start_period: 30s
 
+  cart_database:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: cart_mssql_db
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "CartGameEShop2024!"
+      MSSQL_PID: "Express"
+    ports:
+      - "1435:1433"
+    volumes:
+      - cart_mssql_volume:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P 'CartGameEShop2024!' -Q 'SELECT 1'"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+
   gameeshop:
     build:
       context: .
@@ -68,7 +87,7 @@ services:
     container_name: cart_service
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      ConnectionStrings__DefaultConnection: "Server=database;Database=GameEShop;User Id=sa;Password=GameEShop;TrustServerCertificate=True;"
+      ConnectionStrings__DefaultConnection: "Server=cart_database;Database=CartGameEShop;User Id=sa;Password=CartGameEShop2024!;TrustServerCertificate=True;"
     depends_on:
       - database
       - redis
@@ -97,6 +116,20 @@ services:
       context: .
       dockerfile: NotificationService/Dockerfile
     container_name: notification_service
+    depends_on:
+      - kafka
+    environment:
+      - smtpHost=${smtpHost}
+      - smtpPort=${smtpPort}
+      - smtpPassword=${smtpPassword}
+      - smtpUsername=${smtpUsername}
+
+  finalizationnotificationservice:
+    image: ${DOCKER_REGISTRY-}finalizationnotificationservice
+    build:
+      context: .
+      dockerfile: FinalizationNotificationService/Dockerfile
+    container_name: finalization_notification_service
     depends_on:
       - kafka
     environment:
@@ -134,3 +167,5 @@ services:
 volumes:
   mssql_volume:
   user_mssql_volume:
+  cart_mssql_volume:
+  

@@ -1,4 +1,4 @@
-﻿namespace CartService.Models;
+﻿namespace CartApplication.DTO;
 
 public class AddToCartRequest
 {

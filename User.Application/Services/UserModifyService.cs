@@ -13,25 +13,51 @@ public class UserModifyService : IUserModifyService
         _dbContext = dbContext;
     }
 
-    public async Task<User.Domain.Models.Entities.User?> UpdateUserAsync(
-        int userId,
-        string? email = null,
-        string? password = null,
-        bool? isActive = null)
+    public async Task<bool> UpdateUserEmailAsync(int userId, string newEmail)
     {
-        var user = await _dbContext.Users.Include(u => u.Roles).FirstOrDefaultAsync(u => u.Id == userId);
+        var user = await _dbContext.Users.FindAsync(userId);
+        if (user == null) return false;
+
+        if (await _dbContext.Users.AnyAsync(u => u.Email == newEmail))
+        {
+            throw new InvalidOperationException("Email is already taken.");
+        }
+
+        user.Email = newEmail;
+        await _dbContext.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<bool> UpdateUserPasswordAsync(int userId, string oldPassword, string newPassword)
+    {
+        var user = await _dbContext.Users.FindAsync(userId);
+        if (user == null) return false;
+
+        if (!PasswordHasher.Verify(oldPassword, user.PasswordHash))
+        {
+            throw new InvalidOperationException("Incorrect old password.");
+        }
+
+        user.PasswordHash = PasswordHasher.Hash(newPassword);
+        await _dbContext.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<User.Domain.Models.Entities.User?> UpdateUserStatusAsync(int userId, bool isActive) // Zmieniono `bool?` na `bool`
+    {
+        var user = await _dbContext.Users
+            .Include(u => u.Roles)
+            .FirstOrDefaultAsync(u => u.Id == userId);
+
         if (user == null) return null;
 
-        if (!string.IsNullOrEmpty(email))
-            user.Email = email;
-        if (!string.IsNullOrEmpty(password))
-            user.PasswordHash = PasswordHasher.Hash(password);
-        if (isActive.HasValue)
-            user.IsActive = isActive.Value;
+        // Logika została uproszczona, ponieważ `isActive` zawsze będzie miało wartość
+        user.IsActive = isActive;
 
         await _dbContext.SaveChangesAsync();
         return user;
     }
+
 
     public async Task<bool> DeleteUserAsync(int userId)
     {

@@ -1,51 +1,66 @@
-﻿using User.Domain.Repositories;
+﻿using Microsoft.EntityFrameworkCore;
 using User.Domain.Models.Entities;
+using User.Domain.Repositories;
 using User.Domain.Utils;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace User.Domain.Seeders;
 
-public class UserSeeder(UserDbContext dbContext) : IUserSeeder
+public class UserSeeder : IUserSeeder
 {
+    private readonly UserDbContext _dbContext;
+    public UserSeeder(UserDbContext dbContext)
+    {
+        _dbContext = dbContext;
+    }
+
     public async Task Seed()
     {
-        if (!dbContext.Users.Any())
+        // Krok 1: Jeśli w bazie nie ma żadnych ról, dodaj je.
+        if (!await _dbContext.Roles.AnyAsync())
         {
-            var Users = new List<User.Domain.Models.Entities.User>
+            var roles = new List<Role>
+            {
+                new Role { Name = "Admin" },
+                new Role { Name = "Employee" },
+                new Role { Name = "Customer" }
+            };
+            await _dbContext.Roles.AddRangeAsync(roles);
+            await _dbContext.SaveChangesAsync();
+        }
+
+        // Krok 2: Jeśli w bazie nie ma żadnych użytkowników, dodaj ich.
+        if (!await _dbContext.Users.AnyAsync()) 
+        {
+            var adminRole = await _dbContext.Roles.FirstAsync(r => r.Name == "Admin");
+            var employeeRole = await _dbContext.Roles.FirstAsync(r => r.Name == "Employee");
+            var customerRole = await _dbContext.Roles.FirstAsync(r => r.Name == "Customer");
+
+            var users = new List<User.Domain.Models.Entities.User>
             {
                 new User.Domain.Models.Entities.User {
-                    
                     Username = "admin",
                     Email = "mateusz.wojcik2003@gmail.com",
                     PasswordHash = PasswordHasher.Hash("admin"),
-                    Roles = new List<Role> { new Role { Name = "Admin" } },
-                    CreatedAt = DateTime.UtcNow,
-                    LastLoginAt = DateTime.UtcNow,
-                    IsActive = true
-                    },
+                    Roles = new List<Role> { adminRole } // Przypisujemy istniejącą rolę
+                },
                 new User.Domain.Models.Entities.User {
-                    
                     Username = "employee",
                     Email = "employee@test.com",
-                     PasswordHash = PasswordHasher.Hash("employee"),
-                    Roles = new List<Role> { new Role { Name = "Employee" } },
-                    CreatedAt = DateTime.UtcNow,
-                    LastLoginAt = DateTime.UtcNow,
-                    IsActive = true
-                    },
-                new User.Domain.Models.Entities.User
-                {
+                    PasswordHash = PasswordHasher.Hash("employee"),
+                    Roles = new List<Role> { employeeRole } // Przypisujemy istniejącą rolę
+                },
+                new User.Domain.Models.Entities.User {
                     Username = "customer",
                     Email = "customer@test.com",
-                     PasswordHash = PasswordHasher.Hash("customer"),
-                    Roles = new List<Role> { new Role { Name = "Customer" } },
-                    CreatedAt = DateTime.UtcNow,
-                    LastLoginAt = DateTime.UtcNow,
-                    IsActive = true
+                    PasswordHash = PasswordHasher.Hash("customer"),
+                    Roles = new List<Role> { customerRole } // Przypisujemy istniejącą rolę
                 }
-
             };
-            dbContext.Users.AddRange(Users);
-            dbContext.SaveChanges();
+
+            await _dbContext.Users.AddRangeAsync(users);
+            await _dbContext.SaveChangesAsync();
         }
     }
 }
