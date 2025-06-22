@@ -29,4 +29,10 @@
 	 <ProjectReference Include="..\User.Domain\User.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="data\public.key">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
